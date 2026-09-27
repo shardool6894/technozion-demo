@@ -13,14 +13,16 @@ const Card = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const {
-    title,
-    name,
-    overview,
+    name : title,
+    club : name,
+    description,
+    teamSize,
+    contact,
     rules,
-    judging_criteria,
+    judgingCriteria : judging_criteria,
     imgsrc,
     glink,
-    total_cost,
+    totalCost : total_cost,
   } = location.state || {};
 
   const [imageSrc, setImageSrc] = useState(imgsrc);
@@ -109,7 +111,7 @@ const Card = () => {
             {/* Section 2: Overview */}
             <div className="card-section card-section-overview custom-scrollbar">
               <div className="font-bold text-2xl lg:text-3xl uppercase tracking-wide text-cyan-300 mb-4">
-                {overview?.main_title || title}
+                {title}
               </div>
 
               {glink && (
@@ -132,54 +134,43 @@ const Card = () => {
                     Description
                   </span>
                   <div className="section-text text-sm lg:text-[1.05rem] leading-relaxed">
-                    {overview.description}
+                    {description}
                   </div>
                 </section>
               )}
 
-              {total_cost ? (
+              {totalCost ? (
                 <section className="overview-item mb-5 flex flex-col gap-y-1">
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
                     Prizes worth
                   </span>
                   <span className="text-xl lg:text-2xl font-bold text-cyan-300">
-                    ₹ {total_cost}
+                    ₹ {totalCost}
                     <sup>*</sup>
                   </span>
                 </section>
               ) : null}
 
-              {overview?.cash_prize && (
-                <section className="overview-item mb-5 flex flex-col gap-y-1">
-                  <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
-                    Cash Prize
-                  </span>
-                  <span className="text-xl lg:text-2xl font-bold text-cyan-300">
-                    ₹ {overview.cash_prize}
-                  </span>
-                </section>
-              )}
-
-              {overview?.team_size && (
+              {team_size && (
                 <section className="overview-item mb-5 flex flex-col gap-y-1">
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
                     Participation
                   </span>
                   <div className="font-bold text-sm lg:text-base">
-                    {String(overview.team_size) === "1"
+                    {String(teamSize) === "1"
                       ? "Individual"
-                      : overview.team_size}
+                      : teamSize}
                   </div>
                 </section>
               )}
 
-              {overview?.contact && overview.contact.length > 0 && (
+              {contact && contact.length > 0 && (
                 <section className="overview-item mb-4 flex flex-col gap-y-1">
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase mb-1">
                     Contact
                   </span>
                   <div className="flex flex-col gap-3">
-                    {overview.contact.map((contact, index) => (
+                    {contact.map((contact, index) => (
                       <div
                         key={index}
                         className="contact-card p-3 rounded-lg bg-black/40 border border-cyan-500/20 flex flex-col gap-y-1"

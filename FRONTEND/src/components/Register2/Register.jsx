@@ -5,24 +5,28 @@ import { useSnackbar } from "../../Context/SnackbarProvider";
 
 const Register = () => {
   const { register: authRegister } = useAuth();
-  const [societies, setSocieties] = useState([]);
-  const [clubs, setClubs] = useState([]);
-  const [workshops, setWorkshops] = useState([])
-
+  // const [societies, setSocieties] = useState([]);
+  // const [clubs, setClubs] = useState([]);
+  // const [workshops, setWorkshops] = useState([])
+  const [events, setEvents] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const clubsRes = await fetch("/dataJSON/club.json");
-        const societiesRes = await fetch("/dataJSON/societyx.json");
-        const workshopRes = await fetch('/dataJSON/workshop.json')
+        // const clubsRes = await fetch("/dataJSON/club.json");
+        // const societiesRes = await fetch("/dataJSON/societyx.json");
+        // const workshopRes = await fetch('/dataJSON/workshop.json')
 
-        const societiesData = await societiesRes.json();
-        const clubsData = await clubsRes.json();
-        const workshopsData = await workshopRes.json()
+        // const societiesData = await societiesRes.json();
+        // const clubsData = await clubsRes.json();
+        // const workshopsData = await workshopRes.json()
 
-        setSocieties(societiesData);
-        setClubs(clubsData);
-        setWorkshops(workshopsData)
+        // setSocieties(societiesData);
+        // setClubs(clubsData);
+        // setWorkshops(workshopsData)
+        const url = window.location.origin; // same pattern AuthManager.jsx already uses
+        const res = await fetch(`${url}/api/events`);
+        const data = await res.json();
+        setEvents(data.events || []);
       } catch (err) {
         console.error("Failed to fetch JSON:", err);
       }
@@ -31,40 +35,52 @@ const Register = () => {
     fetchData();
   }, []);
 
+  // const finalData = React.useMemo(() => {
+  //   const map = new Map();
+
+    
+  //   clubs.forEach(club => {
+  //     if (map.has(club.name)) {
+  //       map.get(club.name).events.push({ ...club, displayName: club.title || club.name });
+  //     } else {
+  //       map.set(club.name, { societyName: club.name, events: [{ ...club, displayName: club.title || club.name }] });
+  //     }
+  //   });
+    
+  //   societies.forEach(soc => {
+  //     map.set(soc.societyName, {
+  //       societyName: soc.societyName,
+  //       events: soc.events.map(ev => ({ ...ev, displayName: ev.title || ev.name }))
+  //     });
+  //   });
+
+  //   workshops.forEach(wk => {
+      
+  //    if (map.has(wk.name)) {
+     
+  //       map.get(wk.name).events.push({ ...wk, displayName: wk.title || wk.name });
+  //     } else {
+  //       map.set(wk.name, { societyName: wk.name, events: [{ ...wk, displayName: wk.title || wk.name }] });
+  //     }
+  //   })
+
+
+    
+  //   return Array.from(map.values());
+  // }, [societies, clubs, workshops]);
   const finalData = React.useMemo(() => {
     const map = new Map();
-
-    
-    clubs.forEach(club => {
-      if (map.has(club.name)) {
-        map.get(club.name).events.push({ ...club, displayName: club.title || club.name });
+    events.forEach(ev => {
+      const groupName = ev.club || "Other";
+      const eventWithDisplay = { ...ev, displayName: ev.name };
+      if (map.has(groupName)) {
+        map.get(groupName).events.push(eventWithDisplay);
       } else {
-        map.set(club.name, { societyName: club.name, events: [{ ...club, displayName: club.title || club.name }] });
+        map.set(groupName, { societyName: groupName, events: [eventWithDisplay] });
       }
     });
-    
-    societies.forEach(soc => {
-      map.set(soc.societyName, {
-        societyName: soc.societyName,
-        events: soc.events.map(ev => ({ ...ev, displayName: ev.title || ev.name }))
-      });
-    });
-
-    workshops.forEach(wk => {
-      
-     if (map.has(wk.name)) {
-     
-        map.get(wk.name).events.push({ ...wk, displayName: wk.title || wk.name });
-      } else {
-        map.set(wk.name, { societyName: wk.name, events: [{ ...wk, displayName: wk.title || wk.name }] });
-      }
-    })
-
-
-    
     return Array.from(map.values());
-  }, [societies, clubs, workshops]);
-
+  }, [events]);
   console.log(finalData)
 
   const {

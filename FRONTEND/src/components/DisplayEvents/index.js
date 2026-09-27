@@ -14,20 +14,28 @@ export function Displayevents() {
       try {
         // Fetch data for the selected card (based on previous selection)
         let response;
-        if (state && state.dataSource === 'societies') {
-          response = await fetch('/dataJSON/societies.json');
-        } else if (state && state.dataSource === 'spotlight') {
-          response = await fetch('/dataJSON/spotlight.json');
-        } else if (state && state.dataSource === 'clubevents') {
-          response = await fetch('/dataJSON/clubevents.json');
+        if (state && state.dataSource === 'spotlight') {
+          const response = await fetch('/dataJSON/spotlight.json');
+          if (!response.ok) throw new Error('Failed to fetch data');
+          const result = await response.json();
+          setData(result);
+          return;
+        } 
+        const eventTypeMap = { societies: 'society', clubevents: 'club' };
+        const eventType = eventTypeMap[dataSource];
+ 
+        if (!eventType) {
+          setData(null);
+          return;
         }
-
+        const url = window.location.origin;
+        const response = await fetch(`${url}/api/events`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
-
-        const result = await response.json();
-        setData(result);
+        const { events } = await response.json();
+        const filtered = (events || []).filter((ev) => ev.eventType === eventType);
+        setData(filtered)
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading data:', error);

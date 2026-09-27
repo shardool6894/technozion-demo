@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+//import contactSchema here before moving forward
 const eventSchema = new mongoose.Schema({
     name: { type: String, required: true },
     slug: { type: String, unique: true, sparse: true }, // stable id used by the frontend, e.g. "robo-war"
