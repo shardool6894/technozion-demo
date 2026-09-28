@@ -4,7 +4,7 @@ const Event = require('../models/Event');
 
 const WRITABLE_FIELDS = [
     'name', 'club', 'description', 'venue', 'startTime', 'endTime', 'slug', 'registrationOpen',
-    'eventType', 'imgsrc', 'totalCost', 'teamSize', 'duration', 'rules', 'judgingCriteria', 'contact', 'glink'
+    'eventType', 'imgsrc', 'totalCost', 'cashPrize', 'teamSize', 'duration', 'rules', 'judgingCriteria', 'contact', 'glink'
 ];
 
 const pickWritableFields = (body) => {
@@ -53,8 +53,8 @@ const createEvent = async (req, res) => {
     try {
         const fields = pickWritableFields(req.body || {});
 
-        if (!fields.name || !fields.startTime) {
-            return res.status(400).json({ message: 'name and startTime are required' });
+        if (!fields.name) {
+            return res.status(400).json({ message: 'name is required' });
         }
         if (!fields.slug) {
             fields.slug = fields.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
