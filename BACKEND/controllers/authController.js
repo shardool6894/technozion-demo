@@ -9,7 +9,6 @@ const register = async (req, res) => {
     try {
         const {
             name,
-            email,
             password,
             collegeName,
             accommodation,
@@ -19,7 +18,7 @@ const register = async (req, res) => {
             idDocumentUrl = null,
             paymentScreenshotUrl = null
         } = req.body || {};
-
+        const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
         // Validation
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email and password are required" });
@@ -71,7 +70,7 @@ const register = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role : role,
+            roles : role,
             collegeName: collegeName || undefined,
             accommodation: accommodationBool,
             registrationType,
@@ -92,7 +91,7 @@ const register = async (req, res) => {
             user: {
                 name: user.name,
                 email: user.email,
-                role: user.role,
+                role: user.roles,
                 collegeName: user.collegeName || null,
                 accommodation: !!user.accommodation,
                 registrationType: user.registrationType,
@@ -122,7 +121,11 @@ const register = async (req, res) => {
 // Login
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { password } = req.body;
+        const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+        if (!email || typeof password !== 'string' || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
 
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "User not found" });
@@ -135,7 +138,7 @@ const login = async (req, res) => {
             user: {
                 name: user.name,
                 email: user.email,
-                role: user.role,
+                role: user.roles,
                 collegeName: user.collegeName || null,
                 accommodation: !!user.accommodation,
                 registrationType: user.registrationType,

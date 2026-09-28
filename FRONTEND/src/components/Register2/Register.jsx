@@ -4,7 +4,7 @@ import { API_URL } from "../../config";
 import { useAuth } from "../../Context/AuthManager";
 import { useSnackbar } from "../../Context/SnackbarProvider";
 
-const Register = () => {
+export const Register = () => {
   const { register: authRegister } = useAuth();
   // const [societies, setSocieties] = useState([]);
   // const [clubs, setClubs] = useState([]);
@@ -81,7 +81,7 @@ const Register = () => {
     });
     return Array.from(map.values());
   }, [events]);
-  console.log(finalData)
+  // console.log(finalData)
   const eventNameById = React.useMemo(
     () => Object.fromEntries(events.map((e) => [e._id, e.name])),
     [events]
