@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
         }
     },
     events: { type: [String], default: [] },
+    roles: {type: String, enum: ['user', 'admin'], default: 'user'},
     idDocumentUrl: { type: String, default: null },
     paymentScreenshotUrl: { type: String, default: null },
     registrationNum: { type: String, unique: true }

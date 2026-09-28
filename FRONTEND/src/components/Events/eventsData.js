@@ -1,6 +1,7 @@
+import { API_URL } from "../../config";
+
 export const fetchEvents = async () => {
-  const url = window.location.origin;
-  const res = await fetch(`${url}/api/events`);
+  const res = await fetch(`${API_URL}/api/events`);
   if (!res.ok) {
     throw new Error(`Failed to load events (${res.status})`);
   }

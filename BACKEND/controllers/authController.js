@@ -53,12 +53,13 @@ const register = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         const accommodationBool = accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1;
-
+        const role = 'user'
         // Prepare user payload
         const userPayload = {
             name,
             email,
             password: hashedPassword,
+            role : role,
             collegeName: collegeName || undefined,
             accommodation: accommodationBool,
             registrationType,
@@ -79,6 +80,7 @@ const register = async (req, res) => {
             user: {
                 name: user.name,
                 email: user.email,
+                role: user.role,
                 collegeName: user.collegeName || null,
                 accommodation: !!user.accommodation,
                 registrationType: user.registrationType,
@@ -115,13 +117,13 @@ const login = async (req, res) => {
 
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(400).json({ message: "Incorrect Password" });
-
         const token = jwt.sign({ id: user._id }, process.env.jwt_key, { expiresIn: '1h' });
 
         res.json({
             user: {
                 name: user.name,
                 email: user.email,
+                role: user.role,
                 collegeName: user.collegeName || null,
                 accommodation: !!user.accommodation,
                 registrationType: user.registrationType,

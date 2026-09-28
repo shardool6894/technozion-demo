@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { API_URL } from "../../config";
 import { useAuth } from "../../Context/AuthManager";
 import { useSnackbar } from "../../Context/SnackbarProvider";
 
@@ -23,8 +24,7 @@ const Register = () => {
         // setSocieties(societiesData);
         // setClubs(clubsData);
         // setWorkshops(workshopsData)
-        const url = window.location.origin; // same pattern AuthManager.jsx already uses
-        const res = await fetch(`${url}/api/events`);
+        const res = await fetch(`${API_URL}/api/events`);
         const data = await res.json();
         setEvents(data.events || []);
       } catch (err) {

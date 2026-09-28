@@ -12,6 +12,10 @@ const pickWritableFields = (body) => {
     for (const field of WRITABLE_FIELDS) {
         if (body[field] !== undefined) out[field] = body[field];
     }
+    if (out.slug !== undefined) {
+        const slug = String(out.slug).trim();
+        if (slug) out.slug = slug; else delete out.slug;
+    }
     if (out.startTime) out.startTime = new Date(out.startTime);
     if (out.endTime) out.endTime = new Date(out.endTime);
     return out;
@@ -52,7 +56,9 @@ const createEvent = async (req, res) => {
         if (!fields.name || !fields.startTime) {
             return res.status(400).json({ message: 'name and startTime are required' });
         }
-
+        if (!fields.slug) {
+            fields.slug = fields.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
         const event = await Event.create(fields);
         res.status(201).json(event);
     } catch (err) {
