@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { WebCanvas } from "../bg_animation/bg_animate";
 import Poster from "../event_scroll/poster";
-import { events2026 } from "./eventsData";
+import { fetchEvents } from "./eventsData";
 import "../PastEvents/PastEvents.css";
 import "../event_scroll/index.css";
 
@@ -16,10 +16,29 @@ const CATEGORY_TABS = [
 export const EventsPage = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
-
-  const filteredEvents = events2026.filter((ev) => {
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    let isMounted = true;
+    fetchEvents()
+      .then((data) => {
+        if (isMounted) setEvents(data);
+      })
+      .catch((err) => {
+        console.error("Error loading events:", err);
+        if (isMounted) setError(err.message || "Failed to load events");
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  const filteredEvents = events.filter((ev) => {
     if (selectedCategory === "all") return true;
-    const typeLower = (ev.event_type || "").toLowerCase();
+    const typeLower = (ev.eventType || "").toLowerCase();
     if (selectedCategory === "competition") {
       return typeLower.includes("competition");
     }
@@ -82,15 +101,22 @@ export const EventsPage = () => {
           <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-4 gap-y-8 lg:gap-y-10 lg:m-6 m-3">
             {filteredEvents.map((item, index) => (
               <Poster
-                key={item.index || index}
+                key={item._id || item.slug || index}
                 imageSrc={item.imgsrc || ""}
                 fallbackSrc=""
-                title={item.title}
-                content={item.name}
+                title={item.name}
+                content={item.club}
                 onClick={() => handlePosterClick(item)}
               />
             ))}
           </div>
+          {isLoading && <p className="text-center opacity-70 my-8">Loading events...</p>}
+          {!isLoading && error && (
+            <p className="text-center text-red-400 my-8">Error: {error}</p>
+          )}
+          {!isLoading && !error && filteredEvents.length === 0 && (
+            <p className="text-center opacity-70 my-8">No events available</p>
+          )}
         </div>
       </div>
     </div>

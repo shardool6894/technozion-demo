@@ -1,35 +1,4 @@
-// Maps a backend Event document onto the shape the existing UI
-// (EventsPage, Poster, Card) already expects, so those components
-// don't need to change when the data source does.
-function mapEvent(ev, index) {
-  return {
-    id: ev._id,
-    index: index + 1,
-    title: ev.name,
-    name: ev.club,
-    event_type: ev.eventType,
-    total_cost: ev.totalCost,
-    imgsrc: ev.imgsrc || "",
-    overview: {
-      main_title: ev.name,
-      description: ev.description,
-      team_size: ev.teamSize || "Coming Soon...",
-      duration: ev.duration,
-      event_type: ev.eventType,
-      contact: ev.contact || [],
-    },
-    rules:
-      ev.rules && ev.rules.length > 0
-        ? ev.rules
-        : [
-            "No specific rules provided for this event. Follow general fest guidelines.",
-          ],
-    judging_criteria: ev.judgingCriteria || "Coming Soon...",
-    glink: ev.glink || "",
-  };
-} 
-
-export async function fetchEvents() {
+export const fetchEvents = async () => {
   const url = window.location.origin;
   const res = await fetch(`${url}/api/events`);
   if (!res.ok) {
@@ -37,7 +6,7 @@ export async function fetchEvents() {
   }
   const data = await res.json();
   const events = Array.isArray(data) ? data : data.events || [];
-  return events.map(mapEvent);
+  return events;
 }
 
 // function parsePOC(pocRaw, email) {

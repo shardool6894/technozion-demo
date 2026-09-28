@@ -11,10 +11,11 @@ export function Displayevents() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
+         const dataSource = state?.dataSource;
         // Fetch data for the selected card (based on previous selection)
-        let response;
-        if (state && state.dataSource === 'spotlight') {
+        if (dataSource === 'spotlight') {
           const response = await fetch('/dataJSON/spotlight.json');
           if (!response.ok) throw new Error('Failed to fetch data');
           const result = await response.json();

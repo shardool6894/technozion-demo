@@ -14,15 +14,15 @@ const Card = () => {
   const navigate = useNavigate();
   const {
     name : title,
-    club : name,
+    club,
     description,
     teamSize,
     contact,
     rules,
-    judgingCriteria : judging_criteria,
+    judgingCriteria,
     imgsrc,
     glink,
-    totalCost : total_cost,
+    totalCost,
   } = location.state || {};
 
   const [imageSrc, setImageSrc] = useState(imgsrc);
@@ -77,9 +77,9 @@ const Card = () => {
           {/* Card Header with single Back button */}
           <div className="cardnav p-4 lg:px-6 z-10">
             <div className="flex items-center gap-2">
-              {name && (
+              {club && (
                 <span className="text-xs uppercase tracking-widest px-3 py-1 rounded-full border border-cyan-400/40 bg-cyan-950/40 text-cyan-300 font-semibold">
-                  {name}
+                  {club}
                 </span>
               )}
             </div>
@@ -128,7 +128,7 @@ const Card = () => {
                 </div>
               )}
 
-              {overview?.description && (
+              {description && (
                 <section className="overview-item mb-5 flex flex-col gap-y-1">
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
                     Description
@@ -151,7 +151,7 @@ const Card = () => {
                 </section>
               ) : null}
 
-              {team_size && (
+              {teamSize&& (
                 <section className="overview-item mb-5 flex flex-col gap-y-1">
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
                     Participation
@@ -239,13 +239,13 @@ const Card = () => {
                 </div>
               )}
 
-              {judging_criteria && judging_criteria !== "Coming Soon..." && (
+              {judgingCriteria && judgingCriteria !== "Coming Soon..." && (
                 <div className="mt-6">
                   <div className="font-bold text-lg uppercase tracking-wide text-cyan-300 mb-2">
                     Judging Criteria
                   </div>
                   <div className="p-3.5 rounded-lg bg-black/40 border border-cyan-500/20 text-sm lg:text-[0.95rem] leading-relaxed">
-                    {judging_criteria}
+                    {judgingCriteria}
                   </div>
                 </div>
               )}
