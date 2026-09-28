@@ -3,6 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { API_URL } from "../../config";
 import { useAuth } from "../../Context/AuthManager";
 import { useSnackbar } from "../../Context/SnackbarProvider";
+import { isNitwEmail } from "../utils/email";
 
 export const Register = () => {
   const { register: authRegister } = useAuth();
@@ -148,7 +149,7 @@ export const Register = () => {
   };
 
   const computeAmount = () => {
-    if (watchedEmail && !watchedEmail.includes("nitw.ac.in")) return 500;
+    if (watchedEmail && !isNitwEmail(watchedEmail)) return 500;
     return 0;
   };
 
@@ -159,22 +160,22 @@ export const Register = () => {
     return undefined;
   };
 
-  const uploadToCloudinary = async (file) => {
-    const cloudName = "dpjrslhwg";
-    const uploadPreset = "technozian_upload";
+  // const uploadToCloudinary = async (file) => {
+  //   const cloudName = "dpjrslhwg";
+  //   const uploadPreset = "technozian_upload";
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("upload_preset", uploadPreset);
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-      method: "POST",
-      body: formData,
-    });
+  //   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+  //     method: "POST",
+  //     body: formData,
+  //   });
 
-    const data = await res.json();
-    return data.secure_url;
-  };
+  //   const data = await res.json();
+  //   return data.secure_url;
+  // };
 
   const onSubmit = async (formData) => {
     try {
@@ -213,7 +214,7 @@ export const Register = () => {
       }
 
       // Payment screenshot required if email not nitw.ac.in
-      const needsPayment = isValidEmail(watchedEmail) && !watchedEmail.includes("nitw.ac.in");
+      const needsPayment = isValidEmail(watchedEmail) && !isNitwEmail(watchedEmail);
       const payFile = normalizeFirstFile(paymentScreenshot);
       if (needsPayment && !payFile) {
         setPaymentError("Please upload payment screenshot before registering.");
@@ -466,7 +467,7 @@ export const Register = () => {
                   )}
                 </div>
 
-                {(isValidEmail(watchedEmail) && !watchedEmail.includes("nitw.ac.in")) && (
+                {(isValidEmail(watchedEmail) && !isNitwEmail(watchedEmail)) && (
                   <div className="pt-6">
                     <div className="bg-gray rounded-lg p-4 mb-4">
                       <div className="flex justify-between items-center mb-3">

@@ -3,9 +3,6 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const dotenv = require('dotenv')
 dotenv.config();
-
-const app = express();
-
 // const whitelist = ['https://technozion.nitw.ac.in/', 'http://localhost:3000'];
 
 // const corsOptions = {
@@ -19,14 +16,21 @@ const app = express();
 // };
 
 // app.use(cors(corsOptions)); // to prevent access from untrusted origins
+const REQUIRED_ENV = ['MONGO_URI', 'jwt_key'];
+const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key] || !process.env[key].trim());
+if (missingEnv.length > 0) {
+  console.error(`Missing required environment variable(s): ${missingEnv.join(', ')}`);
+  console.error('Add them to BACKEND/.env (see .env.example) and restart.');
+  process.exit(1);
+}
+if (process.env.jwt_key.length < 16) {
+  console.warn('Warning: jwt_key is very short. Use a long random string in production.');
+}
+const app = express();
 app.use(cors())
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log(err))
 
 const authRoutes = require('./routes/auth')
 app.use('/api/auth', authRoutes)
@@ -38,4 +42,16 @@ const userRoutes = require('./routes/users')
 app.use('/api/users', userRoutes)
 //add enrollment routes here
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+mongoose.connection.on('error', (err) => console.error('MongoDB error:', err.message));
+mongoose.connection.on('disconnected', () => console.warn('MongoDB disconnected'));
+const start = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 10000 });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('MongoDB connection failed:', err.message);
+    process.exit(1);
+  }
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+};
+start();

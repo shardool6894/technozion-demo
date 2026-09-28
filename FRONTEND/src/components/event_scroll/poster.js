@@ -4,7 +4,8 @@ import PosterSkeleton from "../Skeleton/PosterSkeleton";
 
 const Poster = ({ imageSrc, fallbackSrc, title, content, onClick }) => {
   const handleError = (e) => {
-    e.target.src = fallbackSrc; // Set fallback image if the original fails
+    e.target.onerror = null;
+    if (fallbackSrc) e.target.src = fallbackSrc;
   };
 
   return (

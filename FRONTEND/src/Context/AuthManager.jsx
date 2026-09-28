@@ -3,16 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { Loader } from '../components/Loader'
 import { useSnackbar } from './SnackbarProvider'
 import {API_URL} from '../config'
+import { isNitwEmail } from '../components/utils/email'
 
 const AuthContext = createContext()
 export const useAuth = () => useContext(AuthContext)
 
 const readStoredUser = () => {
   try {
-    return JSON.parse(localStorage.getItem('user_info'))
-  } catch {
-    return null
-  }
+    const raw = localStorage.getItem('user_info')
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object') return parsed
+  } catch {}
+  try { localStorage.removeItem('user_info') } catch {}
+  return null
 }
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(readStoredUser)
@@ -21,13 +25,6 @@ const AuthProvider = ({ children }) => {
   const navigate = useNavigate()
   const url = API_URL;
   const { notify } = useSnackbar()
-  
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user_info')
-    if (storedUser) setUser(JSON.parse(storedUser))
-  }, [])
-
   const login = async (email, password) => {
     setLoading(true)
     try {
@@ -95,8 +92,13 @@ const AuthProvider = ({ children }) => {
 
     // Upload Payment Screenshot if needed
     let paymentScreenshotUrl = null;
-    const emailDomain = registrationData.email?.trim().toLowerCase().split("@")[1];
-    if (!emailDomain.endsWith("nitw.ac.in")) {
+    const emailDomain = (registrationData.email || "").trim().toLowerCase().split("@")[1];
+    if (!emailDomain) {
+      notify('Please enter a valid email address.', { variant: 'error' })
+      setLoading(false);
+      return;
+    }
+    if (!isNitwEmail(registrationData.email)) {
       if (registrationData.paymentScreenshot) {
         const paymentFile = Array.isArray(registrationData.paymentScreenshot)
           ? registrationData.paymentScreenshot[0]

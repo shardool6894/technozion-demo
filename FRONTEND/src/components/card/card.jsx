@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import "./card.css";
 import { WebCanvas } from "../bg_animation/bg_animate";
 import fallbackImg from "./tzcomingsoon.png";
@@ -8,6 +7,20 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
 import CopyWrapper from "../utils/CopyWrapper";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+
+const toRuleList = (value) => {
+  if (Array.isArray(value)) {
+    return value.filter((v) => typeof v === "string" || typeof v === "number");
+  }
+  if (typeof value === "string" && value.trim()) return [value];
+  return [];
+};
+const toContactList = (value) => {
+  return Array.isArray(value)
+    ? value.filter((c) => c && typeof c === "object")
+    : [];
+}
 
 const Card = () => {
   const location = useLocation();
@@ -24,7 +37,8 @@ const Card = () => {
     glink,
     totalCost,
   } = location.state || {};
-
+  const contactList = toContactList(contact);
+  const ruleList = toRuleList(rules);
   const [imageSrc, setImageSrc] = useState(imgsrc);
   const cardRef = useRef(null);
 
@@ -59,8 +73,12 @@ const Card = () => {
 
   // Handles image load error
   const handleImageError = () => {
-    setImageSrc(fallbackImg);
+    setImageSrc((current) => (current === fallbackImg ? "" : fallbackImg));
   };
+
+  if (!location.state) {
+    return <Navigate to="/events" replace />;
+  }
 
   return (
     <div className="card-container" onClick={handleContainerClick}>
@@ -170,7 +188,7 @@ const Card = () => {
                     Contact
                   </span>
                   <div className="flex flex-col gap-3">
-                    {contact.map((contact, index) => (
+                    {contactList.map((contact, index) => (
                       <div
                         key={index}
                         className="contact-card p-3 rounded-lg bg-black/40 border border-cyan-500/20 flex flex-col gap-y-1"
@@ -216,9 +234,9 @@ const Card = () => {
                 Rules
               </div>
 
-              {rules && rules.length > 0 ? (
+              {ruleList.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  {rules.map((rule, index) => (
+                  {ruleList.map((rule, index) => (
                     <div
                       key={index}
                       className="rule-item flex items-start gap-3 p-3.5 rounded-lg bg-black/40 border border-cyan-500/20"
