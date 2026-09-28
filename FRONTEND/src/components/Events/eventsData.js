@@ -1,12 +1,41 @@
 import { API_URL } from "../../config";
+import rawEvents from "../../data/new_events.json";
+import { normalizeEvents } from "../../data/normalizeEvents";
+
+const REQUEST_TIMEOUT_MS = 6000;
+const CACHE_TTL_MS = 60 * 1000;
+let cache = { events: null, at: 0 };
+
+export const getFallbackEvents = () => normalizeEvents(rawEvents);
+
+const fetchFromApi = async () => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${API_URL}/api/events`, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(`Failed to load events (${res.status})`);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : data && data.events;
+    return Array.isArray(list) ? list.filter((e) => e && typeof e === "object") : [];
+  } finally {
+    clearTimeout(timer);
+  }
+};
 
 export const fetchEvents = async () => {
-  const res = await fetch(`${API_URL}/api/events`);
-  if (!res.ok) {
-    throw new Error(`Failed to load events (${res.status})`);
+  if (cache.events && Date.now() - cache.at < CACHE_TTL_MS) return cache.events;
+  let events = [];
+  try {
+    events = await fetchFromApi();
+    if (events.length === 0) console.warn("[events] API returned no events - using bundled list");
+  } catch (err) {
+    console.warn("[events] API unavailable - using bundled list:", err.message);
   }
-  const data = await res.json();
-  const events = Array.isArray(data) ? data : data.events || [];
+  if (events.length === 0) events = getFallbackEvents();
+  cache = { events, at: Date.now() };
   return events;
 }
 
