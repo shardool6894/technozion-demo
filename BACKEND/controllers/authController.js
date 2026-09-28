@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const Event = require('../models/Event');
 
 // Register
 const register = async (req, res) => {
@@ -28,6 +30,9 @@ const register = async (req, res) => {
         if (exist) {
             return res.status(400).json({ message: "Email already registered" });
         }
+        if (password.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters" });
+        }
 
         // Validate team registration
         if (registrationType === 'team') {
@@ -49,7 +54,14 @@ const register = async (req, res) => {
                 });
             }
         }
-
+        const eventIds = [...new Set((Array.isArray(events) ? events : []).map(String))];
+        if (eventIds.length === 0 || !eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
+            return res.status(400).json({ message: "Select at least one valid event" });
+        }
+        const validCount = await Event.countDocuments({ _id: { $in: eventIds }, registrationOpen: true });
+        if (validCount !== eventIds.length) {
+            return res.status(400).json({ message: "One or more selected events are invalid or closed" });
+        }
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         const accommodationBool = accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1;
@@ -64,7 +76,7 @@ const register = async (req, res) => {
             accommodation: accommodationBool,
             registrationType,
             teamMembers: registrationType === 'team' ? teamMembers : [],
-            events,
+            events: eventIds,
             idDocumentUrl,
             paymentScreenshotUrl
         };

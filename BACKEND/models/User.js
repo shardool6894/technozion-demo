@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
             message: 'Team must have 1-4 additional members (2-5 total including leader)'
         }
     },
-    events: { type: [String], default: [] },
+    events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
     roles: {type: String, enum: ['user', 'admin'], default: 'user'},
     idDocumentUrl: { type: String, default: null },
     paymentScreenshotUrl: { type: String, default: null },

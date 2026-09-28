@@ -82,7 +82,10 @@ const Register = () => {
     return Array.from(map.values());
   }, [events]);
   console.log(finalData)
-
+  const eventNameById = React.useMemo(
+    () => Object.fromEntries(events.map((e) => [e._id, e.name])),
+    [events]
+  );
   const {
     register: reactRegister,
     handleSubmit,
@@ -219,20 +222,19 @@ const Register = () => {
       }
 
       // Generate password
-      const rand8 = Math.floor(10000000 + Math.random() * 90000000);
-      const password = String(rand8);
+      // const rand8 = Math.floor(10000000 + Math.random() * 90000000);
+      // const password = String(rand8);
 
 
 
       // Preserve original behavior
       const authData = {
         ...formData,
-        password,
         idDocument: idFile,
         paymentScreenshot: payFile || undefined,
       };
 
-      console.log("Registering with data", authData);
+      // console.log("Registering with data", authData);
       // notify && notify('Submitting registration...', { variant: 'info' })
       try {
         await authRegister(authData);
@@ -337,7 +339,25 @@ const Register = () => {
                     </div>
                   )}
                 </div>
-
+                <div>
+                  <label className="block text-sm font-medium mb-2">Password *</label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="At least 8 characters"
+                    {...reactRegister("password", {
+                      required: "Password is required",
+                      minLength: { value: 8, message: "Use at least 8 characters" },
+                    })}
+                    className="w-full px-4 py-3 bg-gray rounded-lg text-white placeholder-grayishWhite/50 focus:outline-none focus:ring-2 focus:ring-cyan transition"
+                  />
+                  {errors.password && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-red-400 text-sm">⚠</span>
+                      <p className="text-red-400 text-sm">{errors.password.message}</p>
+                    </div>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">College *</label>
                   <input
@@ -495,7 +515,7 @@ const Register = () => {
                             key={i}
                             className="inline-flex items-center px-3 py-1 bg-cyan/20 text-sm rounded-full"
                           >
-                            {event}
+                            {eventNameById[event] || event}
                             <button
                               type="button"
                               onClick={() => {
@@ -524,16 +544,16 @@ const Register = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {item.events.map((ev, i) => {
                             const eventName = ev.displayName || "Unnamed Event";
-                            const isSelected = selectedEventsState.includes(eventName);
+                            const isSelected = selectedEventsState.includes(ev._id);
 
                             return (
                               <label
-                                key={i}
+                                key={ev._id || i}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   const next = !isSelected
-                                    ? [...selectedEventsState, eventName]
-                                    : selectedEventsState.filter((x) => x !== eventName);
+                                    ? [...selectedEventsState, ev._id]
+                                    : selectedEventsState.filter((x) => x !== ev._id);
                                   setSelectedEventsState(next);
                                   setValue("events", next, { shouldValidate: true });
                                   if (next.length > 0) {

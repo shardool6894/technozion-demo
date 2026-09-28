@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const Event = require('../models/Event');
 
 const getUserEvents = async (req, res) => {
     try {
