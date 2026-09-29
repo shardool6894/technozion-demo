@@ -11,7 +11,14 @@ const CATEGORY_TABS = [
   { key: "competition", label: "COMPETITIONS" },
   { key: "funevent", label: "FUN EVENTS" },
   { key: "demonstration", label: "DEMONSTRATIONS" },
+  { key: "workshop", label: "WORKSHOPS" },
 ];
+
+const prizeLine = (ev) => {
+  if (typeof ev.cashPrize === "string" && ev.cashPrize.trim()) return ev.cashPrize.trim();
+  const amount = Number(ev.totalCost);
+  return amount > 0 ? `₹ ${amount.toLocaleString("en-IN")}` : "";
+};
 
 export const EventsPage = () => {
   const navigate = useNavigate();
@@ -48,8 +55,15 @@ export const EventsPage = () => {
     if (selectedCategory === "demonstration") {
       return typeLower.includes("demonstration");
     }
+    if (selectedCategory === "workshop") {
+      return typeLower.includes("workshop");
+    }
     return true;
   });
+
+  const eventCount = filteredEvents.length;
+  const countLabel =
+    isLoading || error ? "EVENTS" : `${eventCount} ${eventCount === 1 ? "EVENT" : "EVENTS"}`;
 
   const handlePosterClick = (item) => {
     navigate("/card", {
@@ -61,7 +75,7 @@ export const EventsPage = () => {
       },
     });
   };
-
+  
   return (
     <div className="past-events-root">
       <div className="past-events-canvas">
@@ -74,7 +88,7 @@ export const EventsPage = () => {
           <div className="edition-topbar-row">
             <div className="edition-badge-container">
               <h1 className="edition-title-badge">Technozion 2026</h1>
-              <span className="edition-year-pill">EVENTS</span>
+              <span className="edition-year-pill">{countLabel}</span>
             </div>
 
             {/* Category Filter Tabs */}
@@ -106,6 +120,7 @@ export const EventsPage = () => {
                 fallbackSrc=""
                 title={item.name}
                 content={item.club}
+                footer={prizeLine(item)}
                 onClick={() => handlePosterClick(item)}
               />
             ))}

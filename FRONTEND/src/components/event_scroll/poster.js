@@ -2,7 +2,7 @@ import React from "react";
 import "./poster.css"; // Assuming you have some styles for Poster
 import PosterSkeleton from "../Skeleton/PosterSkeleton";
 
-const Poster = ({ imageSrc, fallbackSrc, title, content, onClick }) => {
+const Poster = ({ imageSrc, fallbackSrc, title, content, footer, onClick }) => {
   const handleError = (e) => {
     e.target.onerror = null;
     if (fallbackSrc) e.target.src = fallbackSrc;
@@ -24,6 +24,7 @@ const Poster = ({ imageSrc, fallbackSrc, title, content, onClick }) => {
       <div className="flex flex-col justify-end min-h-[3.75rem]">
         <h3 className="font-bold">{title}</h3>
         <p className="opacity-70">{content}</p>
+        {footer ? <p className="text-sm font-semibold mt-1">{footer}</p> : null}
       </div>
     </div>
   );
