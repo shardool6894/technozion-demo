@@ -151,7 +151,7 @@ const Card = () => {
                   <span className="section-label opacity-70 text-[0.95rem] tracking-wider uppercase">
                     Description
                   </span>
-                  <div className="section-text text-sm lg:text-[1.05rem] leading-relaxed">
+                  <div className="section-text text-sm lg:text-[1.05rem] leading-relaxed whitespace-pre-line">
                     {description}
                   </div>
                 </section>

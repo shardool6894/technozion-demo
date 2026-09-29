@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Loader } from '../components/Loader'
 import { useSnackbar } from './SnackbarProvider'
 import {API_URL} from '../config'
-import { isNitwEmail } from '../components/utils/emails'
+import { isNitwEmail } from '../components/utils/registrationChecks'
 
 const AuthContext = createContext()
 export const useAuth = () => useContext(AuthContext)

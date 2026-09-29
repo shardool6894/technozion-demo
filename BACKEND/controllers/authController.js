@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
+const { isNitwEmail, validateUploads } = require('../middleware/registrationChecks');
 
 // Register
 const register = async (req, res) => {
@@ -23,7 +24,10 @@ const register = async (req, res) => {
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email and password are required" });
         }
-
+        const uploadError = validateUploads({ email, idDocumentUrl, paymentScreenshotUrl });
+        if (uploadError) {
+            return res.status(400).json({ message: uploadError });
+        }
         // Check if email already exists
         const exist = await User.findOne({ email });
         if (exist) {
@@ -77,7 +81,7 @@ const register = async (req, res) => {
             teamMembers: registrationType === 'team' ? teamMembers : [],
             events: eventIds,
             idDocumentUrl,
-            paymentScreenshotUrl
+            paymentScreenshotUrl : isNitwEmail(email) ? null : paymentScreenshotUrl
         };
 
         // Create user

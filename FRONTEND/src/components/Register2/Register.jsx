@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { API_URL } from "../../config";
 import { useAuth } from "../../Context/AuthManager";
 import { useSnackbar } from "../../Context/SnackbarProvider";
-import { isNitwEmail } from "../utils/emails";
+import { isNitwEmail } from "../utils/registrationChecks";
 
 export const Register = () => {
   const { register: authRegister } = useAuth();

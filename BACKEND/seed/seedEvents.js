@@ -20,21 +20,21 @@ const seed = async () => {
     console.error('No events found in seed/events.json after normalizing - nothing to do.');
     process.exit(1);
   }
-  console.log(`Connecting to ${process.env.MONGO_URI} ...`);
   await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 10000 });
   console.log('MongoDB connected');
- 
+  const overwrite = process.argv.includes('--update');
   let created = 0;
   let updated = 0;
   for (const event of events) {
     const result = await Event.updateOne(
       { slug: event.slug },
-      { $set: event },
+      overwrite ? { $set: event } : { $setOnInsert: event },
       { upsert: true }
     );
-    if (result.upsertedCount > 0) created++;
-    else updated++;
-    console.log(`  ${result.upsertedCount > 0 ? 'created' : 'updated'}: ${event.name} (${event.slug})`);
+    let status = 'skipped (already exists)';
+    if (result.upsertedCount > 0) { created++; status = 'created'; }
+    else if (overwrite) { updated++; status = 'updated'; }
+    console.log(`  ${status}: ${event.name} (${event.slug})`);
   }
   console.log(`\nDone. ${created} event(s) created, ${updated} event(s) updated, ${events.length} total.`);
   await mongoose.disconnect();
